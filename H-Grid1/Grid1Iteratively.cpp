@@ -16,27 +16,24 @@ const int mod = 1e9 + 7;
 int rows, cols;
 
 vector <string> grid;
-vector <vector <int>> memo;
+vector <vector <int>> dp;
 
-bool valid(int row, int col) {
-    return row >= 0 and row < rows and col >= 0 and col < cols and grid[row][col] != '#';
-}
+int Grid1 () {
+    dp[rows][cols] = 1;
 
-int Grid1 (int row, int col) {
-    if (!valid(row, col))
-        return 0;
+    for (int row = rows; row >= 1; row--) {
+        for (int col = cols; col >= 1; col--) {
+            if (row == rows and col == cols) 
+                continue;
 
-    if (row == rows - 1 and col == cols - 1)
-        return 1;
+            dp[row][col] = (dp[row + 1][col] + dp[row][col + 1]) % mod;
 
-    int& ret = memo[row][col];
-    if (~ret)
-        return ret;
+            if (grid[row - 1][col - 1] == '#')
+                dp[row][col] = 0;
+        }
+    }
 
-    int right = Grid1(row, col + 1);
-    int down = Grid1(row + 1, col);
-
-    return ret = (right + down) % mod;
+    return dp[1][1];
 }
 
 int main () {
@@ -44,13 +41,12 @@ int main () {
 
     cin >> rows >> cols;
     grid = vector <string> (rows);
-    memo = vector <vector <int>> (rows + 1, vector <int> (cols + 1, -1));
+    dp = vector <vector <int>> (rows + 5, vector <int> (cols + 5, 0));
 
     for (auto & row : grid) 
         cin >> row;
 
-
-    cout << Grid1(0, 0) << endl;
-    cout_2d(memo, rows, cols);
+    cout << Grid1() << endl;
+    // cout_2d(dp, rows + 1, cols + 1);
     return 0;
 }
